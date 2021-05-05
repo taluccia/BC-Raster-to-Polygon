@@ -43,9 +43,17 @@ ea_bc = "+proj=aea +lat_1=50 +lat_2=58.5 +lat_0=45 +lon_0=-126 +x_0=1000000 +y_0
 tw_rdnbr = raster("../data/rdnbr/TW_rdnbr.tif")
 ```
 
+```{r}
+en_rdnbr = raster("../data/rdnbr/EN_rdnbr.tif")
+```
+
 # Read in Shapefile
 ```{r}
 tw_perm = readOGR("../data/perimeters/tw_R10252_2013_Forestonly.shp", "tw_R10252_2013_Forestonly") 
+```
+
+```{r}
+en_perm = readOGR("../data/perimeters/en_R10171_2012_Forestonly.shp", "en_R10171_2012_Forestonly") 
 ```
 
 # Reproject in Equal area
@@ -54,6 +62,9 @@ tw_perm = readOGR("../data/perimeters/tw_R10252_2013_Forestonly.shp", "tw_R10252
 tw_perm_ea = spTransform(tw_perm, CRS(ea_bc))
 ```
 
+```{r}
+en_perm_ea = spTransform(en_perm, CRS(ea_bc))
+```
 
 # Clip raster to polygon
 ```{r}
@@ -61,8 +72,19 @@ tw_clip <- mask(tw_rdnbr, tw_perm_ea)
 ```
 
 ```{r}
+en_clip <- mask(en_rdnbr, en_perm_ea)
+```
+
+# Plot
+
+```{r}
 plot(tw_clip)
 plot(tw_perm_ea, add=TRUE)
+```
+
+```{r}
+plot(en_clip)
+plot(en_perm_ea, add=TRUE)
 ```
 
 # Convert raster to polygon
@@ -73,15 +95,34 @@ tw_rdnbr_poly = rasterToPolygons(tw_clip, fun=NULL, n=4, na.rm=TRUE, digits=12, 
 ```
 
 ```{r}
+en_rdnbr_poly = rasterToPolygons(en_clip, fun=NULL, n=4, na.rm=TRUE, digits=12, dissolve=FALSE)
+
+```
+
+# Plot
+```{r}
 plot(tw_rdnbr_poly)
 ```
 
 ```{r}
+plot(en_rdnbr_poly)
+```
+
+# Convert to sf
+```{r}
 tw_rdnbr_sf = st_as_sf(tw_rdnbr_poly)
+```
+
+```{r}
+en_rdnbr_sf = st_as_sf(en_rdnbr_poly)
 ```
 
 #  Write to shapefile
 
 ```{r}
 st_write(tw_rdnbr_sf, "../outputs/tw_rdnnbr_poly.shp", driver="ESRI Shapefile") 
+```
+
+```{r}
+st_write(en_rdnbr_sf, "../outputs/en_rdnnbr_poly.shp", driver="ESRI Shapefile") 
 ```
